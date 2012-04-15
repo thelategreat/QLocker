@@ -30,39 +30,64 @@ clear:both;
 #var_tabs{
 clear:both;
 }
+
+
+#var_tabs_selected{
+background-color:grey;
+}
 </style>
-
-
 <script>
 
 var_dict={};
 
+
+//Inital array of variables
+//When a new variable is created
+//  Scan list of arrays to see if it exists
+//  If it doesn't exists
+//      Add it to array
+//      Switch focus to this array
+
+//Function switch focus
+    //Change styling to highlighted
+    //get_var_form
+
+
+
 function renderVariables(){
     container = document.getElementById('var_tabs');
     container.innerHTML = '';
+    $('#var_editor').css('display', 'block');
     for (var_name in var_dict){
-        container.innerHTML += "<div id = '"+var_name+"_tab' class='var_tab'>"+var_name+"</div>";
-        $("#"+var_name+"_tab").on('click' , function(event){
-            display_var_editor(var_name);
-        });
-        display_var_editor(var_name);
+        container.innerHTML += "<div id = '"+var_name+"_tab' onclick='javascript:get_var_form(1,\""+var_name+"\", false);' class='var_tab'>"+var_name+"</div>";
+//         $("#"+var_name+"_tab").on('click' , function(event){
+//             get_var_form(1,var_name, false);
+//         });
+        //display_var_editor(var_name);
     }
     //alert(container.innerHTML);
 }
 
 
-function display_var_editor(variable){
+function display_var_editor(var_name){
     $('#var_editor').css('display', 'block');
-     get_var_form(0);
+     get_var_form(1, var_name, false);
 }
 
-function get_var_form(type){
+function get_var_form(type, var_name, force){
+    //alert(type+":"+var_name);
+    //$("#"+var_name+"_tab").class('var_tabs_selected');
     $.ajax({
-        url: "/qlocker/variableAttributes?type="+encodeURIComponent(type),
+        url: "/qlocker/variableAttributes?type="+encodeURIComponent(type)+"&displayname="+var_name+"&force="+force,
         context: document.body,
         success: function(data){
         document.getElementById("var_props").innerHTML = data;
-
+        document.getElementById("id_displayname").value = var_name;
+        $("#id_variable_types").change( function(event){
+            var_name=$("#id_displayname").val();
+            get_var_form($("#id_variable_types option:selected").val(), var_name, true);
+            
+            });
         }
     });
 
@@ -73,7 +98,7 @@ function get_var_form(type){
 
 
 function translateEquation(){
-inputString = document.getElementById("input_text").value;
+inputString = document.getElementById("id_solution").value;
 $.ajax({
   url: "/qlocker/convert?e="+encodeURIComponent(inputString),
   context: document.body,
@@ -86,75 +111,107 @@ $.ajax({
 
 }
 
+
+
+
+
+
 </script>
 
 
 <body>
-
 <br>
 <div>
-<div id="story" style='min-height:100px;width:70%;float:left;'>Enter Word Problem<br>
-    <textarea id = 'story_text'></textarea>
-</div>
 <div id = 'var_cont' style='min-height:100px;width:20%;float:right;'>
 Variables<br>
     <div id='var_tabs'></div>
     <div id='var_editor'>
-        <div id = 'var_types'>
-            {{variable_types_form.variable_types}}
-        </div>
-        <div id = 'var_props'></div>
+        <form id = 'var_editor_form' action="#">
+            <div id = 'var_props'></div>
+            <input type='submit'></input>
+        </form>
     </div>
 </div>
-<div id="input" style='min-height:100px;width:70%;float:left;'>Enter Equation<br>
-    <textarea id = 'input_text'></textarea>
+<form style = 'float:left;'>
+<input type='hidden' id="question_id" value='0'></input>
+<div id="story">Enter Word Problem<br>
+    {{questionsForm.question}}
 </div>
-<div id="equation_preview" style='min-height:100px;width:70%;float:left;'>
+<div id="input">Enter Equation<br>
+    {{questionsForm.solution}}
+</div>
+<div id="equation_preview">
     <div id="equation"></div>
 </div>
 <div style = 'clear:both'>
-    <input type='button'  value = 'preview' onclick='javascript:translateEquation()'/>
+        <p id='save_question' style ='background-color:grey;width:40px;'>Save</p> 
+
 </div>
 </div>
 </body>
+</form>
 
 
 
 <script>
 $(function() {
+    $("#id_solution").on('keyup' , function(event){
+        translateEquation();
+     });
 
-    $("#story_text").on('keyup' , function(event){
+    $("#save_question").on('click' , function(event){
+        question=escape($("#id_question").val());
+        solution = escape($('#id_solution').val());
+        question_id = $('#question_id').val();
+        $.ajax({
+            url: "/qlocker/saveQuestion?question="+question+"&solution="+solution+"&id="+question_id,
+            context: document.body,
+            success: function(data){
+                returnData = eval('(' + data + ')');
+                $('#question_id').val(returnData['question_id']);
+                alert($('#question_id').val());
+                    //Set id field
+            }
+        });
+     });
+
+    $("#id_question").on('keyup' , function(event){
         var var_list = new Array();
-        test=$('textarea#story_text').val();
+        test=$('textarea#id_question').val();
         //alert(test);
         vars = test.split("<");
         if (vars.length > 1 && test.split(">").length == vars.length ){
-            //alert(vars)
             var_list= new Array();
-            //alert(var_list);
             for (i = 1; i< vars.length; i++){
-            //alert(vars[i]);
                 var_list = var_list.concat([vars[i].split(">")[0]]);
-                //alert(var_list);
             }
-            //alert(var_list.length);
-            //document.getElementById('var_cont').innerHTML = '';
             for (j=0; j < var_list.length; j++){
-                //document.getElementById('var_cont').innerHTML += " "+var_list[j]; 
                 if (!(var_list[j] in var_dict)){
                     var_dict[var_list[j]] = {'name':var_list[j]};
-                    //alert(var_list[j]);
                 }
             }
         renderVariables();
-        get_var_form(1);
         }
     });
 
-    $("#var_types").change( function(event){
-        get_var_form($("#var_types option:selected").val());
+    $("#id_variable_types").change( function(event){
+        var_name=$("#id_displayname").val();
+        get_var_form($("#id_variable_types option:selected").val(), var_name, false);
     
     });
+
+    $('#var_editor_form').submit(function() {
+    $.ajax({
+        url: "/qlocker/saveVariableAttributes?"+$(this).serialize(),
+        context: document.body,
+        success: function(data){
+  }
+});
+    return false;
+    });
+
+
+
 
 
 });

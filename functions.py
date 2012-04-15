@@ -1,8 +1,4 @@
-###Ok, symPy just blew my mind a little, so i need to completely rethink what I'm doing here.
-#Should accept a user-written string, like "<x>/<y>*60"
-#Should convert this into a meaningful Python object
-#Should return a pretty representation of the function
-#Should be able to, given the values, substitute and solve
+
 
 #I hate import *
 from sympy import *
@@ -32,7 +28,18 @@ def convertStringToEquation(equationString):
     equationString = declareVariables(equationString)
     exp = S(equationString)
     return latex(exp)
+
     
+def convertStringToFunction(equationString):
+    #Declare our variables
+    equationString = declareVariables(equationString)
+    exp = S(equationString)
+    return exp
+    
+def solveFunction(function, variables):
+    for v in variables.keys():
+        function = function.subs(v, variables[v])
+    return function
     
 #convertStringToEquation(equationString)
 
