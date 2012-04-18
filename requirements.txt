@@ -2,4 +2,4 @@ Django==1.4
 gunicorn==0.14.2
 wsgiref==0.1.2
 mysql-python
-sympy
+sympy==0.7.1
