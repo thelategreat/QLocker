@@ -1,1 +1,1 @@
-web: python qlocker/manage.py 0:$PORT
+web: python qlocker/manage.py runserver 0:$PORT
