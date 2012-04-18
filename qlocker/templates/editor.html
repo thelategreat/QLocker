@@ -1,0 +1,239 @@
+<html>
+<script type="text/javascript"
+  src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<style>
+div.var_tab{
+border-style: solid;
+border-width: 1px;
+border-color: black;
+padding:0px 5px 0px 5px;
+height:25px;
+float:left;
+}
+
+#var_editor{
+display: none;
+clear:both;
+}
+
+#var_tabs{
+clear:both;
+}
+
+
+#var_tabs_selected{
+background-color:grey;
+}
+</style>
+<script>
+
+var_dict={};
+
+
+//Inital array of variables
+//When a new variable is created
+//  Scan list of arrays to see if it exists
+//  If it doesn't exists
+//      Add it to array
+//      Switch focus to this array
+
+//Function switch focus
+    //Change styling to highlighted
+    //get_var_form
+
+
+
+function renderVariables(){
+    container = document.getElementById('var_tabs');
+    container.innerHTML = '';
+    $('#var_editor').css('display', 'block');
+    for (var_name in var_dict){
+        container.innerHTML += "<div id = '"+var_name+"_tab' onclick='javascript:get_var_form(1,\""+var_name+"\", false);' class='var_tab'>"+var_name+"</div>";
+//         $("#"+var_name+"_tab").on('click' , function(event){
+//             get_var_form(1,var_name, false);
+//         });
+        //display_var_editor(var_name);
+    }
+    //alert(container.innerHTML);
+}
+
+
+function display_var_editor(var_name){
+    $('#var_editor').css('display', 'block');
+     get_var_form(1, var_name, false);
+}
+
+function get_var_form(type, var_name, force){
+    //alert(type+":"+var_name);
+    //$("#"+var_name+"_tab").class('var_tabs_selected');
+    $.ajax({
+        url: "/qlocker/variableAttributes?type="+encodeURIComponent(type)+"&displayname="+var_name+"&force="+force,
+        context: document.body,
+        success: function(data){
+        document.getElementById("var_props").innerHTML = data;
+        document.getElementById("id_displayname").value = var_name;
+        $("#id_variable_types").change( function(event){
+            var_name=$("#id_displayname").val();
+            get_var_form($("#id_variable_types option:selected").val(), var_name, true);
+            
+            });
+        }
+    });
+
+
+
+}
+
+
+
+function translateEquation(){
+inputString = document.getElementById("id_solution").value;
+$.ajax({
+  url: "/qlocker/convert?e="+encodeURIComponent(inputString),
+  context: document.body,
+  success: function(data){
+   document.getElementById("equation").innerHTML = data;
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"equation"]);
+  }
+});
+
+
+}
+
+
+
+
+
+
+</script>
+
+
+<body>
+<br>
+<div>
+<div id = 'var_cont' style='min-height:100px;width:20%;float:right;'>
+Variables<br>
+    <div id='var_tabs'></div>
+    <div id='var_editor'>
+        <form id = 'var_editor_form' action="#">
+            <div id = 'var_props'></div>
+            <input type='submit'></input>
+        </form>
+    </div>
+</div>
+<form style = 'float:left;'>
+<input type='hidden' id="question_id" value='0'></input>
+<div id="story">Enter Word Problem<br>
+    {{questionsForm.question}}
+</div>
+<div id="input">Enter Equation<br>
+    {{questionsForm.solution}}
+</div>
+<div id="equation_preview">
+    <div id="equation"></div>
+</div>
+<div style = 'clear:both'>
+        <p id='save_question' style ='background-color:grey;width:40px;'>Save</p> 
+
+</div>
+</div>
+</body>
+</form>
+<div id='preview_question' style ='background-color:grey;width:50px;clear:both'>Preview</div> 
+<div id = 'question_preview'></div>
+<div id = 'preview_solution'></div>
+
+<script>
+$(function() {
+    $("#id_solution").on('keyup' , function(event){
+        translateEquation();
+     });
+
+    $("#save_question").on('click' , function(event){
+        question=escape($("#id_question").val());
+        solution = escape($('#id_solution').val());
+        question_id = $('#question_id').val();
+        $.ajax({
+            url: "/qlocker/saveQuestion?question="+question+"&solution="+solution+"&id="+question_id,
+            context: document.body,
+            success: function(data){
+                returnData = eval('(' + data + ')');
+                $('#question_id').val(returnData['question_id']);
+                    //Set id field
+            }
+        });
+     });
+
+    $("#preview_question").on('click' , function(event){
+        question_id = $('#question_id').val();
+        $.ajax({
+            url: "/qlocker/generateQuestion?question_id="+question_id,
+            context: document.body,
+            success: function(data){
+                returnData = eval('(' + data + ')');
+                $('#question_preview').html(returnData['displayQuestion']);
+                $('#preview_solution').html(returnData['answer']);    //Set id field
+            }
+        });
+     });
+
+    $("#id_question").on('keyup' , function(event){
+        var var_list = new Array();
+        test=$('textarea#id_question').val();
+        //alert(test);
+        vars = test.split("<");
+        if (vars.length > 1 && test.split(">").length == vars.length ){
+            var_list= new Array();
+            for (i = 1; i< vars.length; i++){
+                var_list = var_list.concat([vars[i].split(">")[0]]);
+            }
+            for (j=0; j < var_list.length; j++){
+                if (!(var_list[j] in var_dict)){
+                    var_dict[var_list[j]] = {'name':var_list[j]};
+                }
+            }
+        renderVariables();
+        }
+    });
+
+    $("#id_variable_types").change( function(event){
+        var_name=$("#id_displayname").val();
+        get_var_form($("#id_variable_types option:selected").val(), var_name, false);
+    
+    });
+
+    $('#var_editor_form').submit(function() {
+    $.ajax({
+        url: "/qlocker/saveVariableAttributes?"+$(this).serialize(),
+        context: document.body,
+        success: function(data){
+  }
+});
+    return false;
+    });
+
+
+
+
+
+});
+
+
+
+
+
+
+</script>
+
+</html>
