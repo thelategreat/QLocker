@@ -8,7 +8,7 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
+DATABASE_URL = 'mysql://9b4ce23b2c81a2:9a7a0b64@us-cdbr-east.cleardb.com/heroku_5a9512df97814ed?reconnect=true'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
