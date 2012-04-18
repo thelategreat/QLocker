@@ -9,16 +9,16 @@ ADMINS = (
 
 MANAGERS = ADMINS
 DATABASE_URL = 'mysql://9b4ce23b2c81a2:9a7a0b64@us-cdbr-east.cleardb.com/heroku_5a9512df97814ed?reconnect=true'
-#DATABASES = {
-    #'default': {
-        #'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        #'NAME': 'qlocker',                      # Or path to database file if using sqlite3.
-        #'USER': 'root',                      # Not used with sqlite3.
-        #'PASSWORD': 'cradle69',                  # Not used with sqlite3.
-        #'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        #'PORT': '3306',                      # Set to empty string for default. Not used with sqlite3.
-    #}
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'qlocker',                      # Or path to database file if using sqlite3.
+        'USER': 'root',                      # Not used with sqlite3.
+        'PASSWORD': 'cradle69',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3306',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'qlocker',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
