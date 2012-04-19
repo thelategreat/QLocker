@@ -14,11 +14,11 @@ def declareVariables(equationString):
         variableList += [variable]
     for variable in variableList:
         
-        print "%s = Symbol('%s')" % (variable, variable)
+        #print "%s = Symbol('%s')" % (variable, variable)
         exec "%s = Symbol('%s')" % (variable, variable)
     #remove variable indicators
     equationString=equationString.replace("<",'').replace(">","")
-    print equationString
+    #print equationString
     return equationString
     
     
