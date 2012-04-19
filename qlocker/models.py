@@ -55,7 +55,7 @@ class IntegerRange(models.Model):
     step = models.IntegerField()
     
     def load_values(self, get_vars):
-        print get_vars
+        #print get_vars
         self.displayname = get_vars.get("displayname", "None")
         self.start = get_vars.get("start", 1)
         self.stop = get_vars.get("stop",10)
@@ -99,7 +99,7 @@ class DefinedSet(models.Model):
         variableModel.variable_types = self.variable_types
         variableModel.attributes = json.dumps({"values":self.values})
         variableModel.classname = "DefinedSet"
-        print variableModel.variable_types
+        #print variableModel.variable_types
         variableModel.save_it()
     
 class Variable(models.Model):
@@ -136,7 +136,7 @@ class Variable(models.Model):
         
     def getValue(self):
             variableClassString = self.classname
-            print variableClassString
+            #print variableClassString
             exec("variableModel = "+variableClassString+"()")
             variableModel.load_values(json.loads(self.attributes))
             value = variableModel.generate()

@@ -52,13 +52,13 @@ class variableAttributesView(TemplateView):
         existingVariables = Variable.objects.filter(Q(displayname = displayName)).values()
         variableKey = self.request.GET.get('type', 1)
         if existingVariables.count() > 0:
-            print "Found!"
+            #print "Found!"
             existingVariable = existingVariables[0]
             if force == "false":
                 variableKey = existingVariable.get('variable_types', 1)              
         else:
             existingVariable = {}
-        print "Key: ", variableKey
+        #print "Key: ", variableKey
         variableClassString = VariableTypes.objects.filter(id = variableKey).values('classname')[0]['classname']
         exec("variableModel = "+variableClassString+"()")
         variablesForm = VariableForm(variableModel = variableModel, existingVariable =  existingVariable)
@@ -76,7 +76,7 @@ class saveVariableAttributesView(TemplateView):
     def get_context_data(self, **kwargs):
         variableKey = self.request.GET.get('variable_types', 1)
         variableClassString = VariableTypes.objects.filter(id = variableKey).values('classname')[0]['classname']
-        print variableClassString
+        #print variableClassString
         exec("variableModel = "+variableClassString+"()")
         variableModel.load_values(self.request.GET)
         variableModel.save_it()
@@ -86,7 +86,7 @@ class saveQuestionView(TemplateView):
     template_name = "jsonResponse.html"
     
     def get_context_data(self, **kwargs):
-        print self.request.GET
+        #print self.request.GET
         question = self.request.GET.get('question',None)
         solution = self.request.GET.get('solution',None)
         id = self.request.GET.get('id','0')
@@ -111,7 +111,7 @@ class generateVariableView(TemplateView):
     template_name = "jsonResponse.html"
     
     def get_context_data(self, **kwargs):
-        print self.request.GET
+        #print self.request.GET
         value = None
         variable_id = int(self.request.GET.get('variable_id', '0'))
         if variable_id > 0:
@@ -128,7 +128,7 @@ class generateVariableView(TemplateView):
         if existingVariables.count() > 0:
             existingVariable = existingVariables[0]
             variableClassString = existingVariable['classname']
-            print variableClassString
+            #print variableClassString
             exec("variableModel = "+variableClassString+"()")
             variableModel.load_values(json.loads(existingVariable['attributes']))
             value = variableModel.generate()
@@ -139,7 +139,7 @@ class generateVariableView(TemplateView):
         if existingVariables.count() > 0:
             existingVariable = existingVariables[0]
             variableClassString = existingVariable['classname']
-            print variableClassString
+            #print variableClassString
             exec("variableModel = "+variableClassString+"()")
             variableModel.load_values(json.loads(existingVariable['attributes']))
             value = variableModel.generate()
