@@ -10,7 +10,7 @@ from django.forms import widgets
 
 class VariableTypesForm(forms.Form):
     variable_types_choices = VariableTypes.objects.values_list('id', 'displayname')
-    print "choices: ", variable_types_choices
+    #print "choices: ", variable_types_choices
     variable_types = forms.CharField(max_length=25,
                 widget=forms.Select(choices=variable_types_choices))
                 

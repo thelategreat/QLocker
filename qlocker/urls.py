@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^qlocker/saveQuestion', saveQuestionView.as_view(), name='saveQuestion'),
     url(r'^qlocker/generateVariable', generateVariableView.as_view(), name='generateVariable'),
     url(r'^qlocker/generateQuestion', generateQuestionView.as_view(), name='generateQuestion'),
+    url(r'^qlocker/loadQuestion', loadQuestionView.as_view(), name='loadQuestion'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

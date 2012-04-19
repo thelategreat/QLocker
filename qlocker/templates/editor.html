@@ -52,7 +52,21 @@ var_dict={};
     //Change styling to highlighted
     //get_var_form
 
-
+function loadQuestion(id){
+    $.ajax({
+        url: "/qlocker/loadQuestion?question_id="+id,
+        context: document.body,
+        success: function(data){
+            returnData = eval('(' + data + ')');
+            $('#question_id').val(returnData['id']);
+            $('#id_question').val(returnData['question']);
+            $('#id_solution').val(returnData['solution']);
+            $('#id_question').trigger('keyup');
+            
+            
+        }
+    });
+}
 
 function renderVariables(){
     container = document.getElementById('var_tabs');
@@ -73,6 +87,7 @@ function display_var_editor(var_name){
     $('#var_editor').css('display', 'block');
      get_var_form(1, var_name, false);
 }
+
 
 function get_var_form(type, var_name, force){
     //alert(type+":"+var_name);
@@ -132,7 +147,13 @@ Variables<br>
         </form>
     </div>
 </div>
-<form style = 'float:left;'>
+<div style = "height:100%;float:left;width:30%">
+    {%for q in qList%}
+        <div onclick="javascript:loadQuestion({{q.id}});">{{q.question}}</div>
+    {% endfor %}
+</div>
+<div style = 'float:left;'>
+<form>
 <input type='hidden' id="question_id" value='0'></input>
 <div id="story">Enter Word Problem<br>
     {{questionsForm.question}}
@@ -147,12 +168,12 @@ Variables<br>
         <p id='save_question' style ='background-color:grey;width:40px;'>Save</p> 
 
 </div>
-</div>
-</body>
 </form>
-<div id='preview_question' style ='background-color:grey;width:50px;clear:both'>Preview</div> 
+<div id='preview_question' style ='background-color:grey;width:50px;'>Preview</div>
+</div> 
 <div id = 'question_preview'></div>
 <div id = 'preview_solution'></div>
+<div>
 
 <script>
 $(function() {
@@ -236,4 +257,5 @@ $(function() {
 
 </script>
 
+</body>
 </html>

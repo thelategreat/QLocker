@@ -15,6 +15,7 @@ class editorView(TemplateView):
         equationString = "(cos(<x>^2)/<y>)*60"
         latexString = functions.convertStringToEquation(equationString)
         variable_types = VariableTypes.objects
+        qList = Questions.objects.values()
         #print VariableTypes.objects.values('id', 'description')
         variable_types_form = VariableTypesForm()
         questionsForm = QuestionsForm()
@@ -22,6 +23,7 @@ class editorView(TemplateView):
                 'latexString':latexString,
                 'variable_types_form':variable_types_form,
                 'questionsForm':questionsForm,
+                'qList' : qList,
                 }
         return ctx
         
@@ -81,6 +83,22 @@ class saveVariableAttributesView(TemplateView):
         variableModel.load_values(self.request.GET)
         variableModel.save_it()
         return
+        
+class loadQuestionView(TemplateView):
+    template_name = "jsonResponse.html"
+    
+    def get_context_data(self, **kwargs):
+        id = self.request.GET.get('question_id', 1)
+        jsonResponse = ""
+        qList = Questions.objects.filter(Q(id = id)).values()
+        if len(qList) > 0:
+            question = qList[0]
+        jsonResponse = json.dumps(question)
+       
+        ctx = {
+                'jsonResponse' : jsonResponse,
+                }
+        return ctx
         
 class saveQuestionView(TemplateView):
     template_name = "jsonResponse.html"
